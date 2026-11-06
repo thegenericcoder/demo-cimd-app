@@ -87,7 +87,7 @@ Serving `client.json` alone is **not** enough — step 3 is the real validation.
 1. Sign in with a nightly test user.
 2. Browser returns to `callback.html`.
 3. The page exchanges the code at `/token-srv/token` using the PKCE verifier stored in `sessionStorage` (same browser tab/session as **Start authorize**).
-4. Success UI shows masked `access_token` / `id_token` (and refresh if issued). Full secrets are not displayed.
+4. Success UI shows masked tokens plus **decoded JWT claims** for `id_token` and `access_token` (payload only; signature not verified). Full token strings stay masked.
 
 You must start authorize and finish login in the **same browser** so the verifier is available.
 

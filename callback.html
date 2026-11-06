@@ -39,6 +39,26 @@
       return c.slice(0, 4) + mid + c.slice(-4);
     }
 
+    /** Decode JWT payload claims (demo only — signature is not verified). */
+    function decodeJwtClaims(token) {
+      if (!token || token.split('.').length < 2) return null;
+      try {
+        const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        const padded = payload + '='.repeat((4 - (payload.length % 4)) % 4);
+        return JSON.parse(atob(padded));
+      } catch {
+        return null;
+      }
+    }
+
+    function claimsBlock(label, token) {
+      const claims = decodeJwtClaims(token);
+      if (!claims) {
+        return `<h2>${esc(label)}</h2><p class="muted">Not a JWT or could not decode.</p>`;
+      }
+      return `<h2>${esc(label)}</h2><pre>${esc(JSON.stringify(claims, null, 2))}</pre>`;
+    }
+
     function show(html) {
       out.innerHTML = html;
     }
@@ -106,15 +126,16 @@
             );
           } else {
             show(
-              `<p>tokens issued for the CIMD client.</p>
+              `<p>Demo complete — tokens issued for the CIMD client.</p>
                <pre>token_type=${esc(json.token_type || '')}
 expires_in=${esc(json.expires_in ?? '')}
 scope=${esc(json.scope || '')}
 access_token=${esc(maskSecret(json.access_token || ''))}
 id_token=${esc(maskSecret(json.id_token || ''))}
-refresh_token=${esc(json.refresh_token ? maskSecret(json.refresh_token) : '(none)')}
-code=${esc(maskSecret(code))}
-state=${esc(state)}</pre>`,
+refresh_token=${esc(json.refresh_token ? maskSecret(json.refresh_token) : '(none)')}</pre>
+               ${claimsBlock('ID token claims', json.id_token)}
+               ${claimsBlock('Access token claims', json.access_token)}
+               <p class="muted">JWT payloads are decoded in the browser for the demo; signatures are not verified.</p>`,
             );
           }
         } catch (e) {
