@@ -82,9 +82,14 @@ curl -s "https://thegenericcoder.github.io/demo-cimd-app/client.json" | jq .
 
 Serving `client.json` alone is **not** enough — step 3 is the real validation.
 
-### 4. Optional — complete login
+### 4. Complete login + token exchange
 
-Sign in with a nightly test user → land on `callback.html` with a **masked** code in the UI.
+1. Sign in with a nightly test user.
+2. Browser returns to `callback.html`.
+3. The page exchanges the code at `/token-srv/token` using the PKCE verifier stored in `sessionStorage` (same browser tab/session as **Start authorize**).
+4. Success UI shows masked `access_token` / `id_token` (and refresh if issued). Full secrets are not displayed.
+
+You must start authorize and finish login in the **same browser** so the verifier is available.
 
 ### 5. Optional — negative case
 
@@ -102,7 +107,7 @@ Restore CIMD + the allow rule afterward.
 - [ ] `client_id` in JSON equals the public URL
 - [ ] Trust Desk allow: host `thegenericcoder.github.io`, path `/demo-cimd-app/`
 - [ ] Authorize reaches login
-- [ ] (Optional) Login hits `callback.html`
+- [ ] Login + token exchange succeeds on `callback.html`
 - [ ] (Optional) Negative case shown
 
 ---

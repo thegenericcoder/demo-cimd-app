@@ -16,48 +16,111 @@
       background: #f4f4f5;
       padding: 1rem;
       overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
+    .muted { color: #52525b; }
   </style>
 </head>
 <body>
   <h1>OAuth callback</h1>
-  <div id="out"></div>
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const err = params.get('error');
-    const desc = params.get('error_description') || '';
-    const code = params.get('code') || '';
-    const state = params.get('state') || '';
+  <div id="out"><p class="muted">Completing token exchange…</p></div>
+  <script type="module">
+    const PKCE_KEY = 'cimd-demo-pkce';
+    const out = document.getElementById('out');
 
-    function maskCode(c) {
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function maskSecret(c) {
       if (!c || c.length < 8) return '********';
       const mid = '*'.repeat(Math.min(c.length - 8, 24));
       return c.slice(0, 4) + mid + c.slice(-4);
     }
 
-    const out = document.getElementById('out');
-    if (err) {
-      out.innerHTML =
-        '<p>Error: <code>' +
-        err.replace(/</g, '&lt;') +
-        '</code></p><pre>' +
-        desc.replace(/</g, '&lt;') +
-        '</pre>';
-    } else {
-      out.innerHTML =
-        '<p>Admitted and redirected — authorization code received.</p>' +
-        '<pre>code=' +
-        maskCode(code) +
-        '\nstate=' +
-        state.replace(/</g, '&lt;') +
-        '</pre>';
+    function show(html) {
+      out.innerHTML = html;
     }
 
-    // Drop the raw code from the address bar after rendering (keeps history cleaner on demos).
+    const params = new URLSearchParams(window.location.search);
+    const oauthErr = params.get('error');
+    const oauthDesc = params.get('error_description') || '';
+    const code = params.get('code') || '';
+    const state = params.get('state') || '';
+
+    // Mask code in the address bar once we have it in memory.
     if (code && window.history.replaceState) {
       const clean = new URL(window.location.href);
-      clean.searchParams.set('code', maskCode(code));
+      clean.searchParams.set('code', maskSecret(code));
       window.history.replaceState({}, '', clean.toString());
+    }
+
+    if (oauthErr) {
+      show(
+        `<p>Error: <code>${esc(oauthErr)}</code></p><pre>${esc(oauthDesc)}</pre>`,
+      );
+    } else if (!code) {
+      show('<p>No authorization code in the callback.</p>');
+    } else {
+      const raw = sessionStorage.getItem(PKCE_KEY);
+      let pkce;
+      try {
+        pkce = raw ? JSON.parse(raw) : null;
+      } catch {
+        pkce = null;
+      }
+
+      if (!pkce || !pkce.verifier) {
+        show(
+          `<p>Authorization code received, but the PKCE verifier is missing from this browser session.</p>
+           <p class="muted">Start again from the demo home page in the same browser (sessionStorage).</p>
+           <pre>code=${esc(maskSecret(code))}\nstate=${esc(state)}</pre>`,
+        );
+      } else if (pkce.state && state && pkce.state !== state) {
+        show(`<p>State mismatch — aborting token exchange.</p>`);
+        sessionStorage.removeItem(PKCE_KEY);
+      } else {
+        const body = new URLSearchParams({
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: pkce.redirectUri,
+          client_id: pkce.clientId,
+          code_verifier: pkce.verifier,
+        });
+
+        try {
+          const res = await fetch(`${pkce.issuer}/token-srv/token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body,
+          });
+          const json = await res.json().catch(() => ({}));
+          sessionStorage.removeItem(PKCE_KEY);
+
+          if (!res.ok) {
+            show(
+              `<p>Token exchange failed (HTTP ${res.status}).</p>
+               <pre>${esc(JSON.stringify(json, null, 2))}</pre>
+               <pre>code=${esc(maskSecret(code))}\nstate=${esc(state)}</pre>`,
+            );
+          } else {
+            show(
+              `<p>Demo complete — tokens issued for the CIMD client.</p>
+               <pre>token_type=${esc(json.token_type || '')}
+expires_in=${esc(json.expires_in ?? '')}
+scope=${esc(json.scope || '')}
+access_token=${esc(maskSecret(json.access_token || ''))}
+id_token=${esc(maskSecret(json.id_token || ''))}
+refresh_token=${esc(json.refresh_token ? maskSecret(json.refresh_token) : '(none)')}
+code=${esc(maskSecret(code))}
+state=${esc(state)}</pre>`,
+            );
+          }
+        } catch (e) {
+          show(`<p>Token exchange request failed.</p><pre>${esc(e.message || e)}</pre>`);
+        }
+      }
     }
   </script>
 </body>
