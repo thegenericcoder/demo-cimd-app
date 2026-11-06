@@ -1,0 +1,16 @@
+{
+  "_comment": "DEMO ONLY — private key for the Pages client-credentials button. Not for production.",
+  "jwk": {
+    "kty": "RSA",
+    "n": "wcXfPI5veGaXAiYF48fDkDQyI_u3AC2Ei8yKQ2qmGql1j8EON2D974krapLXnbrDZSzXUGDTEs295Wz_vYKHNkcswyB_mWOIV5Dd9MpZN2y9k8dG94PwsmL0rojYS9CpNak_lWn4Lc0DTmZViekD2jPNcOP-Qopsgl8d78_tTMRj1bIIt-sLmi2qr2QJBmHeRs9hEId3NvLZPZWTYtV_BHhXsB8DfPKP25htJvp3g2VToyS-R7UbqrABk6Juo6Zy7jqm2WmjRtFLLLDutqdyDORk7Sr_TkyYETbOqXYIkEFNcX8ELyew14y9Qbci-PYiIHk8VqEqKDLj-6rs--btfw",
+    "e": "AQAB",
+    "d": "RaiD3UmY8e_zVj7j_CP6fhL9eWkKOuKiFP2FMMIcj1Ye4Hw2x5qy_tLRTEEYiOe0SWFKz-bWyhozK1A5SV-sissgYM8Ef9hDkbMOz2qUkvOg3QiUzvLb6szfCAVCuFJ9GcDLjkNnh9N83ki0dFzTWTQpJO2ZIEORyXY3FVgqht8soFJE9_qeQMlnL5cudh8xqzdeVdcjWj8-RyznHrqXU4c-rMTDg_5ExBKEgtwiKs_rel5ut-O34UNuGsRlXxv8s-llTTcJHJvChdSlULW8xgACWZCmLgVtTJixJBJcaXTUW5fouAnZeSozoFF4prQwlK-ibM6R_PAQC_lIFr2TNQ",
+    "p": "3tPBtzes27fMAbuTcHvBjEulPlyc8lEU2ZBSeH3RWQl4TY5NrE7_5hC6MwRv1NxwD8k95-FKrJyaSJEeefeyd6ll6xwqlUrFtE372ytZaOJ1Aho6RBYwij3CLadO2isbenCad2DTdK31ODYOFS7BSAT7mlRGA0EMmx-1EnzAK8s",
+    "q": "3p7Ru4j-n40FZs98Rjo7T6roOgTpji3HLJkhddvXyXGEF9hQjATAXHn2HulGjbEqc5PQ-VTCT307GoD5pSBWBH7Lj18p9cBnEdRufREEYU24PrGBX3E0Uemqfr1BqX_LU_EH4hmb0h6361VabVQEfqYTIKS3qw_U6fh2yj8F9p0",
+    "dp": "Cxq-cqUBpkl4jzWL2XUxZg53A66V27WStmzszzhl8Gv6ZNMMp-Of-RUoUlaMRC1gIElFHoMpt4RuY-Nng2iGqlP00kyrCpmZVKz2Oivk3sc6UYqBENeSP7FoNeI6mcDAM8_cwso-f3gT2mNHPGMCGta0uzIr8wmQ2UIxQeSZpxU",
+    "dq": "f2f_ekeeCawIkl1er0Z2WVLjkwjqra8vVSvSRYRrC-PGiGsJNgkmGgbGv8wbz828EOdg6sECb8GpCLMVrNZDxFDYqRX6iqXxlvevwC30BsgXEPI_q2K7YcHMDLq9kIcN092W-GRVlDx2X926YeV6qQzc14rNfr4RyVGkknzdKdU",
+    "qi": "VA6MsWJ5xOfwJaxBQApG8MV8XVfqDhXrdkAxoGomf5qa8lrDO3zQc93qvo2kbls0I8A5ewdAf0GIkVK7guvDa7zJKVhrftk8mS2FzBTwI47GomiAKlyrW7qKU6RGffgTo_oUnoPbZlxTSrei4XKV7LaVx1HymKIWhL-NBA46hNY",
+    "kid": "cimd-demo-cc-1",
+    "alg": "RS256"
+  }
+}

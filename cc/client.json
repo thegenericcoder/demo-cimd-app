@@ -1,0 +1,10 @@
+{
+  "client_id": "https://thegenericcoder.github.io/demo-cimd-app/cc/client.json",
+  "client_name": "CIMD demo client credentials",
+  "grant_types": [
+    "client_credentials"
+  ],
+  "token_endpoint_auth_method": "private_key_jwt",
+  "token_endpoint_auth_signing_alg": "RS256",
+  "jwks_uri": "https://thegenericcoder.github.io/demo-cimd-app/cc/jwks.json"
+}
