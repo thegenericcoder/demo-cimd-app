@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CIMD callback</title>
+  <style>
+    body {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      max-width: 40rem;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      line-height: 1.5;
+    }
+    pre {
+      background: #f4f4f5;
+      padding: 1rem;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>OAuth callback</h1>
+  <div id="out"></div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get('error');
+    const desc = params.get('error_description') || '';
+    const code = params.get('code') || '';
+    const state = params.get('state') || '';
+
+    function maskCode(c) {
+      if (!c || c.length < 8) return '********';
+      const mid = '*'.repeat(Math.min(c.length - 8, 24));
+      return c.slice(0, 4) + mid + c.slice(-4);
+    }
+
+    const out = document.getElementById('out');
+    if (err) {
+      out.innerHTML =
+        '<p>Error: <code>' +
+        err.replace(/</g, '&lt;') +
+        '</code></p><pre>' +
+        desc.replace(/</g, '&lt;') +
+        '</pre>';
+    } else {
+      out.innerHTML =
+        '<p>Admitted and redirected — authorization code received.</p>' +
+        '<pre>code=' +
+        maskCode(code) +
+        '\nstate=' +
+        state.replace(/</g, '&lt;') +
+        '</pre>';
+    }
+
+    // Drop the raw code from the address bar after rendering (keeps history cleaner on demos).
+    if (code && window.history.replaceState) {
+      const clean = new URL(window.location.href);
+      clean.searchParams.set('code', maskCode(code));
+      window.history.replaceState({}, '', clean.toString());
+    }
+  </script>
+</body>
+</html>

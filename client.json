@@ -1,0 +1,10 @@
+{
+  "client_id": "https://thegenericcoder.github.io/demo-cimd-app/client.json",
+  "client_name": "CIMD demo client",
+  "redirect_uris": [
+    "https://thegenericcoder.github.io/demo-cimd-app/callback.html"
+  ],
+  "grant_types": ["authorization_code"],
+  "response_types": ["code"],
+  "token_endpoint_auth_method": "none"
+}
