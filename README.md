@@ -9,9 +9,10 @@ Hosted on **GitHub Pages** (no ngrok, no Node server at runtime):
 
 | URL | Purpose |
 | :--- | :--- |
-| [/](https://thegenericcoder.github.io/demo-cimd-app/) | Demo UI + **Start authorize** |
-| [/client.json](https://thegenericcoder.github.io/demo-cimd-app/client.json) | Metadata document (`client_id`) |
-| [/callback.html](https://thegenericcoder.github.io/demo-cimd-app/callback.html) | OAuth redirect (code masked in UI) |
+| [/](https://thegenericcoder.github.io/demo-cimd-app/) | Demo UI + authorize buttons |
+| [/client.json](https://thegenericcoder.github.io/demo-cimd-app/client.json) | Happy-path metadata (`client_id` matches URL) |
+| [/invalid/client.json](https://thegenericcoder.github.io/demo-cimd-app/invalid/client.json) | Failure-path metadata (same name, different path; `client_id` **does not** match URL) |
+| [/callback.html](https://thegenericcoder.github.io/demo-cimd-app/callback.html) | OAuth redirect (code masked; claims on success) |
 
 `resolve-preview` is **not** used — validation is a real authorize against nightly.
 
@@ -71,7 +72,7 @@ curl -s "https://thegenericcoder.github.io/demo-cimd-app/client.json" | jq .
 ### 3. Happy-path authorize (required proof)
 
 1. Open https://thegenericcoder.github.io/demo-cimd-app/
-2. Click **Start authorize**
+2. Click **Start authorize** (uses `client.json`)
 3. Interpret the result:
 
 | Result | Meaning |
@@ -81,6 +82,15 @@ curl -s "https://thegenericcoder.github.io/demo-cimd-app/client.json" | jq .
 | Redirect URI error | Document `redirect_uris` does not match the request |
 
 Serving `client.json` alone is **not** enough — step 3 is the real validation.
+
+### 3b. Failure-path authorize (validation refusal)
+
+Same host rule covers `/invalid/client.json` (under `/demo-cimd-app/`), so **admission** succeeds and **fetch** succeeds. The document is invalid because its `client_id` still points at `…/client.json` while the URL is `…/invalid/client.json`.
+
+1. Click **Start authorize (expect failure)**
+2. Expect `invalid_client` (metadata invalid / `client_id` mismatch) — not login
+
+This shows CIMD rejecting a bad document without needing a second Trust Desk rule.
 
 ### 4. Complete login + token exchange
 

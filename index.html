@@ -20,33 +20,53 @@
       padding: 0.1rem 0.35rem;
       border-radius: 4px;
     }
-    button {
-      display: inline-block;
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
       margin-top: 1.25rem;
+    }
+    button {
       padding: 0.65rem 1.1rem;
-      background: #18181b;
-      color: #fff;
       border: 0;
       border-radius: 6px;
       font-size: 1rem;
       cursor: pointer;
     }
+    button.primary {
+      background: #18181b;
+      color: #fff;
+    }
+    button.secondary {
+      background: #f4f4f5;
+      color: #18181b;
+      border: 1px solid #d4d4d8;
+    }
+    .muted { color: #71717a; font-size: 0.95rem; }
   </style>
 </head>
 <body>
   <h1>CIMD demo</h1>
   <p>
     Static metadata host for Client ID Metadata Document demos against cidaas nightly.
-    Serves <code>client.json</code> as the OAuth <code>client_id</code>.
   </p>
-  <button type="button" id="start">Start authorize</button>
+  <p class="muted">
+    Happy path: <code>/client.json</code>.
+    Failure path: <code>/invalid/client.json</code> (same file name; document <code>client_id</code> does not match its URL).
+  </p>
+  <div class="actions">
+    <button type="button" class="primary" id="start-ok">Start authorize</button>
+    <button type="button" class="secondary" id="start-fail">Start authorize (expect failure)</button>
+  </div>
 
   <script type="module">
     const ISSUER = 'https://kube-nightlybuild-dev.cidaas.de';
-    const CLIENT_ID = 'https://thegenericcoder.github.io/demo-cimd-app/client.json';
     const REDIRECT_URI = 'https://thegenericcoder.github.io/demo-cimd-app/callback.html';
     const PKCE_KEY = 'cimd-demo-pkce';
     const STATE = 'cimd-demo';
+
+    const CLIENT_OK = 'https://thegenericcoder.github.io/demo-cimd-app/client.json';
+    const CLIENT_BAD = 'https://thegenericcoder.github.io/demo-cimd-app/invalid/client.json';
 
     function b64url(bytes) {
       let s = '';
@@ -64,15 +84,21 @@
       return { verifier, challenge: b64url(new Uint8Array(digest)) };
     }
 
-    document.getElementById('start').addEventListener('click', async () => {
+    async function startAuthorize(clientId) {
       const { verifier, challenge } = await pkceChallenge();
       sessionStorage.setItem(
         PKCE_KEY,
-        JSON.stringify({ verifier, state: STATE, clientId: CLIENT_ID, redirectUri: REDIRECT_URI, issuer: ISSUER }),
+        JSON.stringify({
+          verifier,
+          state: STATE,
+          clientId,
+          redirectUri: REDIRECT_URI,
+          issuer: ISSUER,
+        }),
       );
 
       const authz = new URL(`${ISSUER}/authz-srv/authz`);
-      authz.searchParams.set('client_id', CLIENT_ID);
+      authz.searchParams.set('client_id', clientId);
       authz.searchParams.set('response_type', 'code');
       authz.searchParams.set('redirect_uri', REDIRECT_URI);
       authz.searchParams.set('scope', 'openid profile email');
@@ -80,7 +106,10 @@
       authz.searchParams.set('code_challenge_method', 'S256');
       authz.searchParams.set('state', STATE);
       window.location.href = authz.toString();
-    });
+    }
+
+    document.getElementById('start-ok').addEventListener('click', () => startAuthorize(CLIENT_OK));
+    document.getElementById('start-fail').addEventListener('click', () => startAuthorize(CLIENT_BAD));
   </script>
 </body>
 </html>
